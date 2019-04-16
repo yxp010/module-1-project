@@ -17,8 +17,17 @@ class Controller
     choice = $prompt.select("Sign in or Create an account.") do |menu|
       menu.choice 'Sign In'
       menu.choice 'Create Account'
+      menu.choice 'Exit'
     end
-    choice == 'Sign In' ? self.sign_in : self.create_account
+    # choice == 'Sign In' ? self.sign_in : self.create_account
+    case choice
+      when 'Sign In'
+        self.sign_in
+      when 'Create Account'
+        self.create_account
+      when 'Exit'
+        exit
+    end
   end
 
   #Lobby
@@ -81,16 +90,59 @@ class Controller
   def settings
     choice = $prompt.select("Choose a option.") do |menu|
       menu.choice 'Check Account Information'
+      menu.choice 'Check Ranks'
       menu.choice 'Return to Lobby'
+
     end
 
     case choice
       when 'Check Account Information'
         self.check_account_info
+      when 'Check Ranks'
+        self.check_ranks
       when 'Return to Lobby'
         self.lobby
     end
   end
+
+  def check_ranks
+    choice = $prompt.select("Choose a option.") do |menu|
+      menu.choice 'Top 10 most points players'
+      menu.choice 'Top 10 players of highest number of games'
+      menu.choice 'Most popular games'
+      menu.choice 'Return to settings'
+    end
+
+    case choice
+      when 'Top 10 most points players'
+        User.top_ten_most_points_players
+        self.return_to_ranks
+      when 'Top 10 players of highest number of games'
+        User.top_ten_most_game_play_players
+        self.return_to_ranks
+      when 'Most popular games'
+        self.return_to_ranks
+      when 'Return to settings'
+        self.settings
+    end
+  end
+
+  # def self.top_ten_most_game_play_players
+  #   rank = 1
+  #   ordered_arr = self.all.sort_by {|user| user.games.count}.reverse[0, 10]
+  #   ordered_arr.each do |user|
+  #     puts "#{rank}. #{user.user_name}, Games Played: #{user.games.count}"
+  #     rank += 1
+  #   end
+  # end
+  #
+  # def self.top_ten_most_points_players
+  #   rank = 1
+  #   self.order(points: :desc).limit(10).each do |user|
+  #     puts "#{rank}. #{user.user_name}, Points: #{user.points}"
+  #     rank += 1
+  #   end
+  # end
 
   def check_account_info
     choice = $prompt.select("Choose a option.") do |menu|
@@ -130,10 +182,10 @@ class Controller
     self.settings
   end
 
-  # def return_to_ranks
-  #   self.ask_to_return('Ranks')
-  #   self.ranks
-  # end
+  def return_to_ranks
+    self.ask_to_return('Check Ranks')
+    self.check_ranks
+  end
 
 
 
@@ -148,7 +200,7 @@ class Controller
       choice == 'Try again' ? create_account : loggin_page
     else
       password = $prompt.mask('New password:', default: ENV['USER'])
-      current_user = User.create(user_name: new_user_name, password: password)
+      self.current_user = User.create(user_name: new_user_name, password: password, points: 5000)
       lobby
     end
   end

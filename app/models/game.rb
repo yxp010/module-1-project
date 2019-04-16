@@ -4,6 +4,7 @@ class Game < ActiveRecord::Base
 
 end
 
+
 class Dice < Game
 
   attr_accessor :user_number, :cpu_number
