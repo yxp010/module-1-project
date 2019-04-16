@@ -24,4 +24,37 @@ class User < ActiveRecord::Base
     end
   end
 
+  def self.top_ten_winrate_players
+
+    top_winrate_players = User.all.sort_by do |user|
+      user.winrate
+    end.reverse[0, 10]
+
+    top_winrate_players.each do |player|
+      puts "#{player.user_name}, Winrate: #{player.winrate}%"
+    end
+
+  end
+
+
+
+  def winrate
+    if self.games.count == 0
+      0
+    else
+      (self.games.select {|game| game.result == 'W'}.count / self.games.count.to_f) * 100
+    end
+
+  end
+
+
+
+    # self.all.sort_by {|user| user.games.select {|game| game.result == 'W'}.count / user.games.count}[-10, 10]
+    # Game.all.group(:user_id)
+    # all_user_winrates = User.all.map do |user|
+    #   winned_games = user.games.select {|game| game.result == 'W'}
+    #   winned_games.count / user.games.count
+    # end
+  # end
+
 end

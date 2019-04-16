@@ -10,9 +10,27 @@ class Controller
   end
 
   #Log in page
+
+  def print_main_title
+
+    puts "\e[H\e[2J"
+
+    puts '======================================================================'
+    puts '     ___      ___   ___       ______       _____     _______     '
+    puts '     \  \    /  /  /   \     |   __  \   /  ___  \  |   __   \   '
+    puts '      \  \  /  /  /     \    |  |__|  | |  |   |  | |  |  \   |  '
+    puts '       \  \/  /  /   /\  \   |   ____/  |  |   |  | |  |__/  /   '
+    puts '        \    /  /   /__\  \  |  |       |  |   |  | |   ___  \   '
+    puts '         \  /  /   /    \  \ |  |       |  |___|  | |  |   \  \  '
+    puts '          \/  /___/      \__\|__|        \_______/  |__|    \__\ '
+    puts '======================================================================'
+    puts '               Any similarities are purely coincidental'
+    puts '======================================================================'
+  end
+
   def loggin_page
-    puts "Welcome to Vapor!!"
-    puts "================="
+
+    self.print_main_title
 
     choice = $prompt.select("Sign in or Create an account.") do |menu|
       menu.choice 'Sign In'
@@ -59,11 +77,15 @@ class Controller
   def choose_games
     choice = $prompt.select("Choose a game to paly or Return to Lobby.") do |menu|
       menu.choice 'Dice'
+      menu.choice 'Rock Paper Scissor'
       menu.choice 'Return to Lobby'
+
     end
     case choice
       when 'Dice'
         start_a_game(Dice, choice)
+      when 'Rock Paper Scissor'
+        start_a_game(RPS, choice)
       when 'Return to Lobby'
         self.lobby
     end
@@ -72,7 +94,6 @@ class Controller
   def start_a_game(game_class, game_name)
     new_game = game_class.create(user_id: current_user.id, machine_id: Machine.random_machine_id)
     new_game.name = game_name
-    new_game.save
     new_game.start
 
     self.current_user = User.find(current_user.id)
@@ -109,6 +130,7 @@ class Controller
     choice = $prompt.select("Choose a option.") do |menu|
       menu.choice 'Top 10 most points players'
       menu.choice 'Top 10 players of highest number of games'
+      menu.choice 'Top 10 winrate players'
       menu.choice 'Most popular games'
       menu.choice 'Return to settings'
     end
@@ -120,29 +142,15 @@ class Controller
       when 'Top 10 players of highest number of games'
         User.top_ten_most_game_play_players
         self.return_to_ranks
+      when 'Top 10 winrate players'
+        User.top_ten_winrate_players
+        self.return_to_ranks
       when 'Most popular games'
         self.return_to_ranks
       when 'Return to settings'
         self.settings
     end
   end
-
-  # def self.top_ten_most_game_play_players
-  #   rank = 1
-  #   ordered_arr = self.all.sort_by {|user| user.games.count}.reverse[0, 10]
-  #   ordered_arr.each do |user|
-  #     puts "#{rank}. #{user.user_name}, Games Played: #{user.games.count}"
-  #     rank += 1
-  #   end
-  # end
-  #
-  # def self.top_ten_most_points_players
-  #   rank = 1
-  #   self.order(points: :desc).limit(10).each do |user|
-  #     puts "#{rank}. #{user.user_name}, Points: #{user.points}"
-  #     rank += 1
-  #   end
-  # end
 
   def check_account_info
     choice = $prompt.select("Choose a option.") do |menu|

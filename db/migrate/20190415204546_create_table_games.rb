@@ -4,6 +4,7 @@ class CreateTableGames < ActiveRecord::Migration[5.2]
       t.string :name
       t.integer :user_id
       t.integer :machine_id
+      t.string :result
     end
   end
 end

@@ -16,6 +16,7 @@ ActiveRecord::Schema.define(version: 2019_04_15_204614) do
     t.string "name"
     t.integer "user_id"
     t.integer "machine_id"
+    t.string "result"
   end
 
   create_table "machines", force: :cascade do |t|
