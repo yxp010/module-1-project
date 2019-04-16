@@ -18,7 +18,14 @@ class Dice < Game
     @user_number = throw_dice
     puts "You throwed #{user_number}"
 
-    @cpu_number > @user_number ? self.lost : self.win
+    if @cpu_number > @user_number
+      self.lost
+    elsif @cpu_number < @user_number
+      self.win
+    else
+      self.draw
+    end
+
   end
 
   def win
@@ -31,6 +38,10 @@ class Dice < Game
     self.user.points -= 100
     self.user.save
     puts 'You lost 100 points.'
+  end
+
+  def draw
+    puts 'It is draw, no points!'
   end
 
   def throw_dice

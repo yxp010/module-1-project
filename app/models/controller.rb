@@ -9,6 +9,7 @@ class Controller
     @user_info_hash = {}
   end
 
+  #Log in page
   def loggin_page
     puts "Welcome to Vapor!!"
     puts "================="
@@ -17,9 +18,10 @@ class Controller
       menu.choice 'Sign In'
       menu.choice 'Create Account'
     end
-    choice == 'Sign In' ? sign_in : create_account
+    choice == 'Sign In' ? self.sign_in : self.create_account
   end
 
+  #Lobby
   def lobby
     choice = $prompt.select("Lobby") do |menu|
       menu.choice 'Choose games'
@@ -44,14 +46,12 @@ class Controller
   end
 
 
-
   #Choose Games
   def choose_games
     choice = $prompt.select("Choose a game to paly or Return to Lobby.") do |menu|
       menu.choice 'Dice'
       menu.choice 'Return to Lobby'
     end
-    # choice == 'Dice' ? sign_in : create_account
     case choice
       when 'Dice'
         start_a_game(Dice, choice)
@@ -66,6 +66,8 @@ class Controller
     new_game.save
     new_game.start
 
+    self.current_user = User.find(current_user.id)
+
     choice = $prompt.select("Continue or Return to lobby") do |menu|
       menu.choice 'Continue'
       menu.choice 'Return to Lobby'
@@ -73,7 +75,6 @@ class Controller
 
     choice == 'Continue' ? start_a_game(game_class, game_name) : self.lobby
   end
-
 
 
   # Settings
@@ -120,9 +121,19 @@ class Controller
   end
 
   def return_to_check_account_info
-    self.ask_to_return('check account information')
+    self.ask_to_return('Check Account Information')
     self.check_account_info
   end
+
+  def return_to_settings
+    self.ask_to_return('Settings')
+    self.settings
+  end
+
+  # def return_to_ranks
+  #   self.ask_to_return('Ranks')
+  #   self.ranks
+  # end
 
 
 
