@@ -24,19 +24,109 @@ class Controller
     choice = $prompt.select("Lobby") do |menu|
       menu.choice 'Choose games'
       menu.choice 'Settings'
+      menu.choice 'Sign out'
+      menu.choice 'Exit'
     end
-    choice == 'Choose games' ? choose_games : settings
+    # binding.pry
+    # choice == 'Choose games' ? choose_games : settings
+    case choice
+      when 'Choose games'
+        self.choose_games
+      when 'Settings'
+        self.settings
+      when 'Sign out'
+        self.loggin_page
+      when 'Exit'
+        exit
+    end
+
+
   end
 
+
+
+  #Choose Games
   def choose_games
-    puts "choose_games"
+    choice = $prompt.select("Choose a game to paly or Return to Lobby.") do |menu|
+      menu.choice 'Dice'
+      menu.choice 'Return to Lobby'
+    end
+    # choice == 'Dice' ? sign_in : create_account
+    case choice
+      when 'Dice'
+        start_a_game(Dice, choice)
+      when 'Return to Lobby'
+        self.lobby
+    end
   end
 
+  def start_a_game(game_class, game_name)
+    new_game = game_class.create(user_id: current_user.id, machine_id: Machine.random_machine_id)
+    new_game.name = game_name
+    new_game.save
+    new_game.start
+
+    choice = $prompt.select("Continue or Return to lobby") do |menu|
+      menu.choice 'Continue'
+      menu.choice 'Return to Lobby'
+    end
+
+    choice == 'Continue' ? start_a_game(game_class, game_name) : self.lobby
+  end
+
+
+
+  # Settings
   def settings
-    puts "settings"
+    choice = $prompt.select("Choose a option.") do |menu|
+      menu.choice 'Check Account Information'
+      menu.choice 'Return to Lobby'
+    end
+
+    case choice
+      when 'Check Account Information'
+        self.check_account_info
+      when 'Return to Lobby'
+        self.lobby
+    end
+  end
+
+  def check_account_info
+    choice = $prompt.select("Choose a option.") do |menu|
+      menu.choice 'User name'
+      menu.choice 'Password'
+      menu.choice 'Points'
+      menu.choice 'Return to settings'
+    end
+
+    case choice
+      when 'User name'
+        puts "Your user name: #{self.current_user.user_name}."
+        self.return_to_check_account_info
+      when 'Password'
+        puts "Your password: #{self.current_user.password}."
+        self.return_to_check_account_info
+      when 'Points'
+        puts "Your points: #{self.current_user.points}."
+        self.return_to_check_account_info
+      when 'Return to settings'
+        self.settings
+    end
+
+  end
+
+  def ask_to_return(menu)
+    $prompt.keypress("Press space or enter to return to #{menu}.", keys: [:space, :return])
+  end
+
+  def return_to_check_account_info
+    self.ask_to_return('check account information')
+    self.check_account_info
   end
 
 
+
+  #Create Account
   def create_account
     new_user_name = $prompt.ask('New user name:', default: ENV['USER'])
     if User.find_by(user_name: new_user_name)
@@ -51,11 +141,6 @@ class Controller
       lobby
     end
   end
-
-
-
-
-
 
   # Sign In
   def insert_user_name
@@ -91,7 +176,7 @@ class Controller
     insert_user_name
     insert_password
     # User.find_by(user_name: ,password: )
-    current_user = User.find_by(user_info_hash)
+    self.current_user = User.find_by(user_info_hash)
     lobby
   end
 end
