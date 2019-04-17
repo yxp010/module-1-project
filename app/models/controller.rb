@@ -1,10 +1,12 @@
 
+
+
 class Controller
 
   attr_accessor :current_user, :user_info_hash
 
   def initialize
-    
+
     @user_info_hash = {}
 
   end
@@ -71,7 +73,7 @@ class Controller
       when 'Choose games'
         self.choose_games
       when 'Check Leaderboards'
-        self.check_ranks
+        self.leaderboards
       when 'Settings'
         self.settings
       when 'Sign out'
@@ -87,10 +89,11 @@ class Controller
   #Choose Games
   def choose_games
     print_main_title
-    choice = $prompt.select("Choose a game to paly or Return to Lobby.") do |menu|
+    choice = $prompt.select("Game Menu") do |menu|
       menu.choice 'Dice'
       menu.choice 'Rock Paper Scissor'
       menu.choice 'Slot Machine'
+      menu.choice 'Battleship'
       menu.choice 'Return to Lobby'
 
     end
@@ -101,6 +104,8 @@ class Controller
         start_a_game(RPS, choice)
       when 'Slot Machine'
         start_a_game(SlotMachine, choice)
+      when 'Battleship'
+        start_a_game(BattleShip, choice)
       when 'Return to Lobby'
         self.lobby
     end
@@ -116,17 +121,17 @@ class Controller
 
     choice = $prompt.select("Continue or Return to lobby") do |menu|
       menu.choice 'Continue'
-      menu.choice 'Return to Lobby'
+      menu.choice 'Return to choose different games'
     end
 
-    choice == 'Continue' ? start_a_game(game_class, game_name) : self.lobby
+    choice == 'Continue' ? start_a_game(game_class, game_name) : self.choose_games
   end
 
 
   # Settings
   def settings
     print_main_title
-    choice = $prompt.select("Choose a option.") do |menu|
+    choice = $prompt.select("Settings") do |menu|
       menu.choice 'Check Account Information'
       menu.choice 'Change Password'
       menu.choice 'Search a player'
@@ -216,27 +221,28 @@ class Controller
   end
 
 
-  def check_ranks
+  def leaderboards
     print_main_title
-    choice = $prompt.select("Choose a option.") do |menu|
+    choice = $prompt.select("Leaderboards") do |menu|
       menu.choice 'Top 10 most points players'
       menu.choice 'Top 10 players of highest number of games'
       menu.choice 'Top 10 winrate players'
-      menu.choice 'Most popular games'
+      menu.choice 'Top 10 Popular Games'
       menu.choice 'Return to Lobby'
     end
 
     case choice
       when 'Top 10 most points players'
-        User.top_ten_most_points_players
+        puts Paint[User.top_ten_most_points_players, '#FFD700']
         self.return_to_ranks
       when 'Top 10 players of highest number of games'
-        User.top_ten_most_game_play_players
+        puts Paint[User.top_ten_most_game_play_players, '#FFD700']
         self.return_to_ranks
       when 'Top 10 winrate players'
-        User.top_ten_winrate_players
+        puts Paint[User.top_ten_winrate_players, '#FFD700']
         self.return_to_ranks
-      when 'Most popular games'
+      when 'Top 10 Popular Games'
+        puts Paint[Game.top_ten_most_popular_games, '#FFD700']
         self.return_to_ranks
       when 'Return to Lobby'
         self.lobby
@@ -287,7 +293,7 @@ class Controller
 
   def return_to_ranks
     self.ask_to_return('Check Ranks')
-    self.check_ranks
+    self.leaderboards
   end
 
 

@@ -14,11 +14,12 @@ class User < ActiveRecord::Base
       rank += 1
     end
     table = Terminal::Table.new :title => "Top 10 Most Experienced Players", :headings => ['No.', 'User ID', 'Gameplays'], :rows => rows
-    puts table
+    # puts table
   end
 
   def self.top_ten_most_points_players
     puts "\e[H\e[2J"
+
     rank = 1
     rows = []
     self.order(points: :desc).limit(10).each do |user|
@@ -26,7 +27,7 @@ class User < ActiveRecord::Base
       rank += 1
     end
     table = Terminal::Table.new :title => "Top 10 Most Points Players", :headings => ['No.', 'User ID', 'Points'], :rows => rows
-    puts table
+    # puts table
   end
 
   def self.top_ten_winrate_players
@@ -41,7 +42,7 @@ class User < ActiveRecord::Base
       rows << [player.user_name, "#{player.winrate}%"]
     end
     table = Terminal::Table.new :title => "Top 10 Winrate Players", :headings => ['User ID', 'Winrate'], :rows => rows
-    puts table
+    # puts table
 
   end
 

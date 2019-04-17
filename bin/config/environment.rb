@@ -6,4 +6,4 @@ old_logger = ActiveRecord::Base.logger
 ActiveRecord::Base.logger = nil
 require_all 'app'
 $prompt = TTY::Prompt.new
-Paint.mode = 256
+Paint.mode = 0xFFFFFF
