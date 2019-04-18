@@ -2,7 +2,8 @@ class BattleShip < Game
 
 
 
-  def start
+  def start(user)
+
     new_board = self.board
     puts "Let's play Battleship!\n-----\nYou have 10 tries!\n-----"
     self.print_board(self.board)
@@ -39,11 +40,15 @@ class BattleShip < Game
 
       if turn == 10
         puts "------\nGame Over!\nThe Battleship coordinates were:#{the_ship_row},#{the_ship_col}"
-        self.result('L')
+        puts 'You lost 200 points'
+        user.points -= 200
+        self.result('L', user)
         break
       elsif (guess_row == the_ship_row) && (guess_col == the_ship_col)
         puts "Congratulations! You sunk my battleship!"
-        self.result('W')
+        puts 'You won 400 points'
+        user.points += 400
+        self.result('W', user)
         break
       else
         # if ((guess_row < 0) || (guess_row > 9)) || ((guess_col < 0) || (guess_col > 9))
@@ -62,11 +67,11 @@ class BattleShip < Game
     end
   end
 
-  def result(result)
-    self.result = result
-    self.save
-    self.user.save
+  def result(game_result, user)
+    match = Match.create(game_id: 4, user_id: user.id, result: game_result)
+    user.save
   end
+
 
   def board
     Array.new(10) { Array.new(10, "O") }

@@ -18,12 +18,13 @@ class SlotMachine < Game
     @colors = ['#00FFFF', '#7FFFD4', '#0000FF', '#8A2BE2', '#FF7F50', '#6495ED', '#DC143C', '#006400', '#8B008B', '#9932CC', '#8B0000', '#483D8B', '#FF1493', '#1E90FF', '#B22222', '#FFD700', '#008000', '#C71585', '#FF4500', '#FF0000', '#800080']
   end
 
-  def start
+  def start(user)
     setup_machine
     puts "\e[H\e[2J"
     puts Paint[self.starting_table, '#FFD700']
     $prompt.keypress("Press space or enter to pull lever.", keys: [:space, :return])
     pull_lever
+    check_result(user)
   end
 
   def starting_table
@@ -45,29 +46,27 @@ class SlotMachine < Game
       rows = []
       sleep(1)
     end
-    self.check_result
   end
 
-  def check_result
+  def check_result(user)
     if slots[0] == slots[1] && slots[1] == slots[2]
-      self.user.points += 1000
-      self.result("W")
+      user.points += 1000
+      self.result("W", user)
       puts "Congratulations!! You won 1000 points!!"
     elsif slots[0] == slots[1] || slots[1] == slots[2] || slots[0] == slots[2]
-      self.user.points += 100
-      self.result("W")
+      user.points += 100
+      self.result("W", user)
       puts "Congratulations!! You won 100 points!!"
     else
-      self.user.points -= 50
-      self.result("L")
+      user.points -= 50
+      self.result("L", user)
       puts "Sorry, You lost 50 points :("
     end
   end
 
-  def result(result)
-    self.result = result
-    self.save
-    self.user.save
+  def result(game_result, user)
+    match = Match.create(game_id: 3, user_id: user.id, result: game_result)
+    user.save
   end
 
 

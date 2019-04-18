@@ -2,7 +2,7 @@ class RPS < Game
 
 attr_accessor :user_hand , :cpu_hand
 
-  def start
+  def start(user)
     @user_hand = $prompt.select("Choose an option:") do |menu|
       menu.choice 'Rock'
       menu.choice 'Paper'
@@ -10,48 +10,42 @@ attr_accessor :user_hand , :cpu_hand
     end
     puts "You put #{@user_hand}"
     @cpu_hand = self.hand #this has to be input from user HOW???
-    puts "CPU puts #{@cpu_hand} "
+    puts "CPU(#{self.machines.sample.name}) puts #{@cpu_hand} "
 #THIS IS  NOT FINAL FORM ... JUST PROCESS... not sure what is the syntax for multiple conditions
     if @user_hand == "Rock" && @cpu_hand == "Rock"
-      self.tie
+      self.result('D', user)
     elsif @user_hand == "Rock" && @cpu_hand == "Scissors"
-      self.win
+      self.result('W', user)
     elsif @user_hand == "Rock" && @cpu_hand == "Paper"
-      self.lost
+      self.result('L', user)
     elsif @user_hand == "Paper" && @cpu_hand == "Rock"
-      self.win
+      self.result('W', user)
     elsif @user_hand == "Paper" && @cpu_hand == "Scissors"
-      self.lost
+      self.result('L', user)
     elsif @user_hand == "Paper" && @cpu_hand == "Paper"
-      self.tie
+      self.result('D', user)
     elsif @user_hand == "Scissors" && @cpu_hand == "Rock"
-      self.lost
+      self.result('L', user)
     elsif @user_hand == "Scissors" && @cpu_hand == "Scissors"
-      self.tie
+      self.result('D', user)
     elsif @user_hand == "Scissors" && @cpu_hand == "Paper"
-      self.win
+      self.result('W', user)
     end
   end
 
-  def win
-    self.user.points += 100
-    result('W')
-    puts 'You won 100 points.'
-  end
-  def lost
-    self.user.points -= 100
-    result('L')
-    puts 'You lost 100 points.'
-  end
-  def tie
-    result('D')
-    puts 'Draw.'
-  end
-
-  def result(result)
-    self.result = result
-    self.save
-    self.user.save
+  def result(game_result, user)
+    case game_result
+      when 'W'
+        user.points += 100
+        puts 'Congratulations!! You won 100 points!!'
+      when 'D'
+        puts 'Draw, no points.'
+      when 'L'
+        user.points -= 100
+        puts 'Sorry, you lost 100 points.'
+    end
+    match = Match.create(game_id: 2, user_id: user.id, result: game_result)
+    user.save
   end
 
   def hand

@@ -63,6 +63,7 @@ class Controller
     choice = $prompt.select("Lobby") do |menu|
       menu.choice 'Choose games'
       menu.choice 'Check Leaderboards'
+      menu.choice 'Game Reviews'
       menu.choice 'Settings'
       menu.choice 'Sign out'
       menu.choice 'Exit'
@@ -74,6 +75,8 @@ class Controller
         self.choose_games
       when 'Check Leaderboards'
         self.leaderboards
+      when 'Game Reviews'
+        self.game_reviews
       when 'Settings'
         self.settings
       when 'Sign out'
@@ -85,13 +88,100 @@ class Controller
 
   end
 
+  def game_reviews
+    print_main_title
+    choice = $prompt.select("Games") do |menu|
+      menu.choice 'Dice'
+      menu.choice 'Rock Paper Scissors'
+      menu.choice 'Slot Machine'
+      menu.choice 'Battleship'
+      menu.choice 'Return to Lobby'
+    end
+
+    case choice
+      when 'Dice'
+        puts "\e[H\e[2J"
+        puts Paint[review_table(1), '#FFD700']
+        review = self.write_review_or_return
+        self.current_user.write_review(review, 1)
+        self.return_to_game_reviews(1)
+      when 'Rock Paper Scissors'
+        puts "\e[H\e[2J"
+        puts Paint[review_table(2), '#FFD700']
+        review = self.write_review_or_return
+        self.current_user.write_review(review, 2)
+        self.return_to_game_reviews(2)
+      when 'Slot Machine'
+        puts "\e[H\e[2J"
+        puts Paint[review_table(3), '#FFD700']
+        review = self.write_review_or_return
+        self.current_user.write_review(review, 3)
+        self.return_to_game_reviews(3)
+      when 'Battleship'
+        puts "\e[H\e[2J"
+        puts Paint[review_table(4), '#FFD700']
+        review = self.write_review_or_return
+        self.current_user.write_review(review, 4)
+        self.return_to_game_reviews(4)
+      when 'Return to Lobby'
+        self.lobby
+    end
+  end
+
+  def return_to_game_reviews(game_id)
+    puts "\e[H\e[2J"
+    puts Paint[review_table(game_id), '#FFD700']
+    ask_to_return('Game Reviews')
+    self.game_reviews
+  end
+
+  def review_table(game_id)
+    game = Game.find(game_id)
+    rows = []
+    latest_ten_reviews = game.reviews.reverse[0, 10]
+    latest_ten_reviews.each do |review|
+      arr = [review.user.user_name, review.created_at, review.content]
+      rows << arr
+    end
+
+    table = Terminal::Table.new :title => "Lastest Reviews(#{game.name})", :headings => ['User ID', 'Date', 'Review'], :rows => rows
+  end
+
+  def write_review_or_return
+    choice = $prompt.select("===============") do |menu|
+      menu.choice 'Write a review'
+      menu.choice 'Return to previous menu'
+    end
+
+    case choice
+      when 'Write a review'
+        review = $prompt.ask('Enter Review: ')
+        choice = $prompt.select("Check your review: '#{review}'") do |menu|
+          menu.choice "Submit(Automatically discard if it's empty)"
+          menu.choice 'Discard'
+        end
+        case choice
+        when "Submit(Automatically discard if it's empty)"
+            if review == nil
+              self.game_reviews
+            else
+              review
+            end
+          when 'Discard'
+            self.game_reviews
+        end
+
+      when 'Return to previous menu'
+        self.game_reviews
+    end
+  end
 
   #Choose Games
   def choose_games
     print_main_title
     choice = $prompt.select("Game Menu") do |menu|
       menu.choice 'Dice'
-      menu.choice 'Rock Paper Scissor'
+      menu.choice 'Rock Paper Scissors'
       menu.choice 'Slot Machine'
       menu.choice 'Battleship'
       menu.choice 'Return to Lobby'
@@ -99,32 +189,39 @@ class Controller
     end
     case choice
       when 'Dice'
-        start_a_game(Dice, choice)
-      when 'Rock Paper Scissor'
-        start_a_game(RPS, choice)
+        start_a_game(choice)
+      when 'Rock Paper Scissors'
+        start_a_game(choice)
       when 'Slot Machine'
-        start_a_game(SlotMachine, choice)
+        start_a_game(choice)
       when 'Battleship'
-        start_a_game(BattleShip, choice)
+        start_a_game(choice)
       when 'Return to Lobby'
         self.lobby
     end
   end
 
-  def start_a_game(game_class, game_name)
+  def start_a_game(game_choice)
+    new_game = nil
+    case game_choice
+      when 'Dice'
+        new_game = Dice.find_by(name: game_choice)
+      when 'Rock Paper Scissors'
+        new_game = RPS.find_by(name: game_choice)
+      when 'Slot Machine'
+        new_game = SlotMachine.find_by(name: game_choice)
+      when 'Battleship'
+        new_game = BattleShip.find_by(name: game_choice)
+    end
 
-    new_game = game_class.create(user_id: current_user.id, machine_id: Machine.random_machine_id)
-    new_game.name = game_name
-    new_game.start
-
-    # self.current_user = User.find(current_user.id)
+    new_game.start(current_user)
 
     choice = $prompt.select("Continue or Return to lobby") do |menu|
       menu.choice 'Continue'
       menu.choice 'Return to choose different games'
     end
 
-    choice == 'Continue' ? start_a_game(game_class, game_name) : self.choose_games
+    choice == 'Continue' ? start_a_game(game_choice) : self.choose_games
   end
 
 
@@ -211,7 +308,7 @@ class Controller
     player_user_id_row = ["Uer ID", player.user_name]
     player_points_row = ["Points", player.points]
     player_winrate = ["Winrate", "#{player.winrate}%"]
-    player_gameplays_row = ["Total Gameplays", player.gameplays]
+    player_gameplays_row = ["Total Gameplays", player.matches.count]
     rows << player_user_id_row
     rows << player_points_row
     rows << player_winrate
@@ -298,7 +395,7 @@ class Controller
 
 
 
-  #Create Account
+  #Create Account // NEED TO FIX INTER PASSWORD
   def create_account
     print_main_title
     new_user_name = $prompt.ask('New user name:')
