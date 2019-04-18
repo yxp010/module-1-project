@@ -2,44 +2,31 @@ class Dice < Game
 
   attr_accessor :user_number, :cpu_number
 
-  def start
+  def start(user)
+
     @cpu_number = throw_dice
-    puts "CPU(#{self.machine.name}) throwed #{@cpu_number}"
+    puts "CPU(#{self.machines.sample.name}) throwed #{@cpu_number}"
     @user_number = throw_dice
     puts "You throwed #{user_number}"
 
     if @cpu_number > @user_number
-      self.lost
+      user.points -= 100
+      puts 'You lost 100 points.'
+      result('L', user)
     elsif @cpu_number < @user_number
-      self.win
+      user.points += 100
+      puts 'You won 100 points'
+      result('W', user)
     else
-      self.draw
+      puts 'It is draw, no points!'
+      result('D', user)
     end
 
   end
 
-  def win
-    self.user.points += 100
-    puts 'You won 100 points'
-    self.result('W')
-  end
-
-  def lost
-    self.user.points -= 100
-    puts 'You lost 100 points.'
-    self.result('L')
-  end
-
-  def draw
-    puts 'It is draw, no points!'
-
-    self.result('D')
-  end
-
-  def result(result)
-    self.result = result
-    self.save
-    self.user.save
+  def result(game_result, user)
+    match = Match.create(game_id: 1, user_id: user.id, result: game_result)
+    user.save
   end
 
   def throw_dice

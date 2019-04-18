@@ -1,16 +1,18 @@
 class User < ActiveRecord::Base
 
-  has_many :games
-  has_many :machines, through: :games
+  has_many :reviews
+  has_many :matches
+  has_many :games, through: :reviews
 
   def self.top_ten_most_game_play_players
     puts "\e[H\e[2J"
     rank = 1
     rows = []
-    ordered_arr = self.all.sort_by {|user| user.games.count}.reverse[0, 10]
-    ordered_arr.each do |user|
+    top_ten_array = self.all.sort_by {|user| user.matches.count}.reverse[0, 10]
+    # ordered_arr = self.all.sort_by {|user| user.games.count}.reverse[0, 10]
+    top_ten_array.each do |user|
       # puts "#{rank}. #{user.user_name}, Games Played: #{user.games.count}"
-      rows << [rank, user.user_name, user.games.count]
+      rows << [rank, user.user_name, user.matches.count]
       rank += 1
     end
     table = Terminal::Table.new :title => "Top 10 Most Experienced Players", :headings => ['No.', 'User ID', 'Gameplays'], :rows => rows
@@ -49,10 +51,10 @@ class User < ActiveRecord::Base
 
 
   def winrate
-    if self.games.count == 0
+    if self.matches.count == 0
       0
     else
-      ((self.games.select {|game| game.result == 'W'}.count / self.games.count.to_f) * 100).floor(2)
+      ((self.matches.select {|match| match.result == 'W'}.count / self.matches.count.to_f) * 100).floor(2)
     end
 
   end
@@ -66,21 +68,17 @@ class User < ActiveRecord::Base
   end
 
   def change_password(new_password)
-    if new_password == nil
-      choice = $prompt.select("Please enter a password at least 1 character") do |menu|
-        menu.choice 'Try again'
-        menu.choice 'Return to Settings'
-      end
-      choice == 'Try again' ? self.search_a_player : self.settings
-    else
-      self.password = new_password
-      self.save
-    end
 
+    self.password = new_password
+    self.save
   end
 
   def delete_account
     User.delete(self.id)
+  end
+
+  def write_review(content, game_id)
+    Review.create(content: content, user_id: self.id, game_id: game_id)
   end
 
 

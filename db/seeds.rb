@@ -10,6 +10,13 @@ User.create(user_name: 'jerry', password: 'password', points: 20320)
 User.create(user_name: 'daniel', password: 'password', points: 32821)
 User.create(user_name: 'will', password: 'password', points: 4433)
 
+Dice.create(name: 'Dice')
+RPS.create(name: 'Rock Paper Scissors')
+SlotMachine.create(name: 'Slot Machine')
+BattleShip.create(name: 'Battleship')
 
-Machine.create(name: 'Tony')
-Machine.create(name: 'Josh')
+
+Machine.create(name: 'Tony', game_id: 1)
+Machine.create(name: 'Josh', game_id: 2)
+Machine.create(name: 'Kay', game_id: 3)
+Machine.create(name: 'Trump', game_id: 4)

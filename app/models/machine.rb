@@ -1,7 +1,6 @@
 class Machine < ActiveRecord::Base
 
-  has_many :games
-  has_many :users, through: :games
+  belongs_to :game
 
   def self.random_machine_id
     self.all.map {|machine| machine.id}.sample
