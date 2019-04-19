@@ -37,12 +37,12 @@ attr_accessor :user_hand , :cpu_hand
     case game_result
       when 'W'
         user.points += 100
-        puts 'Congratulations!! You won 100 points!!'
+        puts Paint['Congratulations!! You won 100 points!!', :red, :bright]
       when 'D'
-        puts 'Draw, no points.'
+        puts Paint['Draw, no points.', :red, :bright]
       when 'L'
         user.points -= 100
-        puts 'Sorry, you lost 100 points.'
+        puts Paint['Sorry, you lost 100 points.', :red, :bright]
     end
     match = Match.create(game_id: 2, user_id: user.id, result: game_result)
     user.save

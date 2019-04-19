@@ -11,14 +11,14 @@ class Dice < Game
 
     if @cpu_number > @user_number
       user.points -= 100
-      puts 'You lost 100 points.'
+      puts Paint['You lost 100 points.', :red, :bright]
       result('L', user)
     elsif @cpu_number < @user_number
       user.points += 100
-      puts 'You won 100 points'
+      puts Paint['You won 100 points', :red, :bright]
       result('W', user)
     else
-      puts 'It is draw, no points!'
+      puts Paint['It is draw, no points!', :red, :bright]
       result('D', user)
     end
 

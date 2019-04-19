@@ -40,27 +40,31 @@ class BattleShip < Game
 
       if turn == 10
         puts "------\nGame Over!\nThe Battleship coordinates were:#{the_ship_row},#{the_ship_col}"
-        puts 'You lost 200 points'
+        puts Paint['You lost 200 points', :red, :bright]
         user.points -= 200
         self.result('L', user)
         break
       elsif (guess_row == the_ship_row) && (guess_col == the_ship_col)
         puts "Congratulations! You sunk my battleship!"
-        puts 'You won 400 points'
+        puts Paint['You won 400 points', :red, :bright]
         user.points += 400
         self.result('W', user)
         break
       else
-        # if ((guess_row < 0) || (guess_row > 9)) || ((guess_col < 0) || (guess_col > 9))
-        #     puts "Oops, that's not even in the ocean."
-        if (new_board[guess_row.to_i - 1][guess_col.to_i - 1] == "X")
-            puts "You guessed that one already."
+        # binding.pry
+        if new_board[guess_row.to_i - 1][guess_col.to_i - 1] == Paint["X", :red, :bright]
+            puts "\e[H\e[2J"
+            print_board(new_board)
+            puts Paint["You guessed that one already.", :red, :bright]
         else
-            puts "You missed my battleship!"
+
             new_board[guess_row.to_i - 1][guess_col.to_i - 1] = Paint["X", :red, :bright]
+            puts "\e[H\e[2J"
+            print_board(new_board)
+            puts Paint["You missed my battleship!", :red, :bright]
+
         end
-        puts "\e[H\e[2J"
-        print_board(new_board)
+
       end
       # print_board(new_board)
       turn += 1

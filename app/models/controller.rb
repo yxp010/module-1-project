@@ -14,7 +14,10 @@ class Controller
   #Log in page
 
   def exit_game
-    self.print_main_title
+    font = TTY::Font.new("standard")
+    byebye = font.write("BYE BYE")
+    puts "\e[H\e[2J"
+    puts Paint[byebye, '#FFD700']
     exit
   end
 
@@ -255,10 +258,6 @@ class Controller
     end
   end
 
-
-  #1. ask a play's user id
-  #2. use the user id to search the player object in database
-  #3. puts out the player's user id, winrate, total number of gameplays, points.
   def change_password
     print_main_title
     new_password = $prompt.mask("Please enter a new password:")
@@ -274,6 +273,7 @@ class Controller
       self.return_to_settings
     end
   end
+
   def search_a_player
     self.print_main_title
     user_name = $prompt.ask("Please enter the player's user id:")
@@ -314,7 +314,7 @@ class Controller
     rows << player_winrate
     rows << player_gameplays_row
     table = Terminal::Table.new :title => "Player's Stats", :rows => rows
-    puts table
+    puts Paint[table, 'FFD700']
   end
 
 
@@ -374,6 +374,7 @@ class Controller
 
   end
 
+  #ASK USER TO PRESS ENTER OR SPACE TO RETURN SPECIFIC PAGE
   def ask_to_return(menu)
     $prompt.keypress("Press space or enter to return to #{menu}.", keys: [:space, :return])
   end
@@ -406,15 +407,23 @@ class Controller
       end
       choice == 'Try again' ? create_account : loggin_page
     elsif new_user_name == nil
-      choice = $prompt.select("Please enter a user name.") do |menu|
+      choice = $prompt.select("Please enter a user name:") do |menu|
         menu.choice 'Try again'
         menu.choice 'Return to lobby'
       end
       choice == 'Try again' ? create_account : loggin_page
     else
-      password = $prompt.mask('New password:', required: true)
-      self.current_user = User.create(user_name: new_user_name, password: password, points: 5000)
-      lobby
+      password = $prompt.mask('New password:')
+      if password == nil
+        choice = $prompt.select("Please enter a password:") do |menu|
+          menu.choice 'Try again'
+          menu.choice 'Return to lobby'
+        end
+        choice == 'Try again' ? create_account : loggin_page
+      else
+        self.current_user = User.create(user_name: new_user_name, password: password, points: 5000)
+        lobby
+      end
     end
   end
 

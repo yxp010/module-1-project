@@ -74,6 +74,8 @@ class User < ActiveRecord::Base
   end
 
   def delete_account
+    Review.where(user_id: self.id).delete_all
+    Match.where(user_id: self.id).delete_all
     User.delete(self.id)
   end
 

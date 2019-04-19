@@ -1,14 +1,5 @@
 class SlotMachine < Game
 
-
-  # TO DO: Let users know the rules.
-
-
-
-
-
-
-
   attr_accessor :symbols, :slots, :colors
 
   def setup_machine
@@ -36,6 +27,8 @@ class SlotMachine < Game
 
   def pull_lever
     rows = []
+    font = TTY::Font.new(:standard)
+    self.slots = [font.write('7'), font.write('7'), font.write('7')]
     slots.each_with_index do |symbol, index|
       self.slots[index] = self.symbols.sample
       rows << self.slots
@@ -52,15 +45,15 @@ class SlotMachine < Game
     if slots[0] == slots[1] && slots[1] == slots[2]
       user.points += 1000
       self.result("W", user)
-      puts "Congratulations!! You won 1000 points!!"
+      puts Paint["Congratulations!! You won 1000 points!!", :red, :bright]
     elsif slots[0] == slots[1] || slots[1] == slots[2] || slots[0] == slots[2]
       user.points += 100
       self.result("W", user)
-      puts "Congratulations!! You won 100 points!!"
+      puts Paint["Congratulations!! You won 100 points!!", :red, :bright]
     else
       user.points -= 50
       self.result("L", user)
-      puts "Sorry, You lost 50 points :("
+      puts Paint["Sorry, You lost 50 points :(", :red, :bright]
     end
   end
 
